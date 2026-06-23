@@ -7,7 +7,8 @@
 
   <!-- OGP -->
   <meta property="og:title" content="弁護士に聞いてみっけ" />
-  <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。こだまや法律事務所のAIアシスタントです。" />
+  <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。弁護士アシスタントiちゃんがお答えします。" />
+  <meta property="og:url" content="https://spc-jp.github.io/kodamaya-chat/" />
   <meta property="og:image" content="" />
 
   <!-- Favicon -->
@@ -31,7 +32,6 @@
       color: #0D3D52;
     }
 
-    /* ヘッダー */
     header {
       width: 100%;
       max-width: 640px;
@@ -57,7 +57,6 @@
       font-weight: 500;
     }
 
-    /* チャットラッパー */
     #chat-wrapper {
       width: 100%;
       max-width: 640px;
@@ -65,10 +64,9 @@
       display: flex;
       flex-direction: column;
       padding: 0 12px;
-      padding-bottom: 80px; /* 入力欄分の余白 */
+      padding-bottom: 80px;
     }
 
-    /* メッセージエリア */
     #messages {
       flex: 1;
       display: flex;
@@ -78,7 +76,6 @@
       padding: 8px 0 16px;
     }
 
-    /* 吹き出し共通 */
     .bubble-row {
       display: flex;
       align-items: flex-end;
@@ -87,8 +84,8 @@
     .bubble-row.user { flex-direction: row-reverse; }
 
     .avatar {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       flex-shrink: 0;
       display: flex;
@@ -97,6 +94,13 @@
       font-size: 1rem;
       background: #1A7FA8;
       color: #fff;
+      overflow: hidden;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
     .bubble-row.user .avatar { background: #0E9DC5; }
 
@@ -119,7 +123,6 @@
       border-bottom-right-radius: 4px;
     }
 
-    /* 入力欄 */
     #input-area {
       position: fixed;
       bottom: 0;
@@ -174,7 +177,6 @@
     #send-btn:active { transform: scale(0.93); }
     #send-btn:disabled { background: #aaa; cursor: not-allowed; }
 
-    /* 残り回数バッジ */
     #remaining-badge {
       text-align: center;
       font-size: 0.72rem;
@@ -182,7 +184,6 @@
       padding-bottom: 4px;
     }
 
-    /* お問合せボタン */
     .contact-buttons {
       display: flex;
       flex-direction: column;
@@ -234,15 +235,15 @@
 </div>
 
 <script>
-  // ===== 設定定数 =====
   const WORKER_URL = "https://kodamaya-chat.yymmatsu.workers.dev";
 
   const SYSTEM_PROMPT = `
-あなたはこだまや法律事務所のAIアシスタントです。
-法律に関する一般的な情報をわかりやすくお伝えします。
+あなたは「iちゃん」という名前の弁護士アシスタントAIです。
+こだまや法律事務所のサポートスタッフとして、法律に関する一般的な情報をわかりやすくお伝えします。
 相続・遺言・離婚・債務整理・交通事故・不動産トラブル・企業法務など幅広い相談に対応します。
 
 回答は必ず以下のルールを守ってください。
+・自分のことは「iちゃん」と名乗る
 ・やさしい言葉で、専門用語はできるだけ避ける
 ・200文字以内でコンパクトに答える
 ・必ず最後に「詳しくはこだまや法律事務所にご相談ください」と添える
@@ -253,34 +254,38 @@
   const MAX_FREE = 5;
   const STORAGE_KEY = "kodamaya_use_count";
 
-  // ===== 状態管理 =====
-  let messages = []; // { role, content }[]
+  let messages = [];
   let useCount = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
 
-  // ===== DOM =====
   const messagesEl = document.getElementById("messages");
   const inputEl    = document.getElementById("user-input");
   const sendBtn    = document.getElementById("send-btn");
   const badgeEl    = document.getElementById("remaining-badge");
 
-  // ===== 初期化 =====
   function init() {
     updateBadge();
     addBubble("ai",
-      "こんにちは！こだまや法律事務所のAIアシスタントです😊\n\n" +
-      "法律のことで気になることがあれば、なんでも気軽に聞いてください。"
+      "こんにちは！弁護士アシスタントのiちゃんです😊\n\n" +
+      "法律のことで気になることがあれば、なんでも気軽に聞いてください。\n" +
+      "まずは無料で5回ご質問いただけます。"
     );
     if (useCount >= MAX_FREE) disableInput();
   }
 
-  // ===== 吹き出し追加 =====
   function addBubble(role, text) {
     const row = document.createElement("div");
     row.className = "bubble-row " + role;
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
-    avatar.textContent = role === "ai" ? "⚖️" : "👤";
+    if (role === "ai") {
+      const img = document.createElement("img");
+      img.src = "ai-avatar.png";
+      img.alt = "iちゃん";
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = "👤";
+    }
 
     const bubble = document.createElement("div");
     bubble.className = "bubble " + role;
@@ -293,20 +298,22 @@
     return bubble;
   }
 
-  // ===== 上限到達メッセージ（ボタン付き）=====
   function addLimitBubble() {
     const row = document.createElement("div");
     row.className = "bubble-row ai";
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
-    avatar.textContent = "⚖️";
+    const img = document.createElement("img");
+    img.src = "ai-avatar.png";
+    img.alt = "iちゃん";
+    avatar.appendChild(img);
 
     const bubble = document.createElement("div");
     bubble.className = "bubble ai";
     bubble.innerHTML =
       "無料相談の回数（5回）を使い切りました。<br><br>" +
-      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ。" +
+      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ😊" +
       '<div class="contact-buttons">' +
         '<a class="contact-btn tel" href="tel:042-975-1000">📞 電話で相談する：042-975-1000</a>' +
         '<a class="contact-btn form" href="https://kodamaya-info.ssl-xserver.jp/script/mailform/file/" target="_blank" rel="noopener">✉️ お問合せフォームはこちら</a>' +
@@ -322,7 +329,6 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  // ===== 残り回数バッジ =====
   function updateBadge() {
     const remaining = Math.max(0, MAX_FREE - useCount);
     if (remaining > 0) {
@@ -332,14 +338,12 @@
     }
   }
 
-  // ===== 入力無効化 =====
   function disableInput() {
     inputEl.disabled = true;
     sendBtn.disabled = true;
     inputEl.placeholder = "無料回数を使い切りました";
   }
 
-  // ===== 送信処理 =====
   async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -350,16 +354,13 @@
       return;
     }
 
-    // ユーザー吹き出し
     addBubble("user", text);
     inputEl.value = "";
     autoResize();
     sendBtn.disabled = true;
 
-    // 履歴に追加
     messages.push({ role: "user", content: text });
 
-    // ローディング
     const loadingBubble = addBubble("ai", "考え中...");
 
     try {
@@ -377,7 +378,6 @@
       loadingBubble.textContent = reply;
       messages.push({ role: "assistant", content: reply });
 
-      // 使用回数インクリメント
       useCount++;
       localStorage.setItem(STORAGE_KEY, String(useCount));
       updateBadge();
@@ -394,13 +394,11 @@
     }
   }
 
-  // ===== テキストエリア自動リサイズ =====
   function autoResize() {
     inputEl.style.height = "auto";
     inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + "px";
   }
 
-  // ===== イベント =====
   sendBtn.addEventListener("click", sendMessage);
   inputEl.addEventListener("input", autoResize);
   inputEl.addEventListener("keydown", (e) => {
