@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>弁護士に聞いてみっけ｜こだまや法律事務所</title>
   <meta property="og:title" content="弁護士に聞いてみっけ" />
-  <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。弁護士アシスタントiちゃんがお答えします。" />
+  <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。弁護士アシスタントi（アイ）がお答えします。" />
   <meta property="og:url" content="https://spc-jp.github.io/kodamaya-chat/" />
   <meta property="og:image" content="" />
   <link rel="icon" type="image/png" href="ai-avatar.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -172,13 +172,6 @@
     #send-btn:active { transform: scale(0.93); }
     #send-btn:disabled { background: #aaa; cursor: not-allowed; }
 
-    #remaining-badge {
-      text-align: center;
-      font-size: 0.72rem;
-      color: #1A7FA8;
-      padding-bottom: 4px;
-    }
-
     .contact-buttons {
       display: flex;
       flex-direction: column;
@@ -218,10 +211,7 @@
 </div>
 <div id="input-area">
   <div id="input-inner">
-    <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
-      <div id="remaining-badge"></div>
-      <textarea id="user-input" rows="1" placeholder="ここに質問を入力してください…"></textarea>
-    </div>
+    <textarea id="user-input" rows="1" placeholder="ここに質問を入力してください…"></textarea>
     <button id="send-btn" title="送信">&#9654;</button>
   </div>
 </div>
@@ -229,7 +219,7 @@
   const WORKER_URL = "https://kodamaya-chat.yymmatsu.workers.dev";
 
   const SYSTEM_PROMPT = `
-あなたは「iちゃん」という名前の弁護士アシスタントです。
+あなたは「i（アイ）」という名前の弁護士アシスタントです。
 こだまや法律事務所のサポートスタッフとして、法律のことで困っている方に寄り添いながら、わかりやすく情報をお伝えするのがお仕事です。
 
 相続や遺言、離婚、債務整理、交通事故、不動産のトラブル、企業法務など、どんなご相談でも丁寧にお答えします。
@@ -241,10 +231,10 @@
 回答の最後には必ず「詳しくはこだまや法律事務所にご相談くださいね」と添えてください。
 個別の法律判断や具体的なアドバイスはせず、あくまで一般的な情報をお伝えするにとどめてください。
 自分は弁護士ではなくAIアシスタントであることを忘れずに、謙虚な姿勢で接してください。
-自分のことは「iちゃん」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
+自分のことは「i（アイ）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
 `;
 
-  const MAX_FREE = 5;
+  const MAX_FREE = 3;
   const STORAGE_KEY = "kodamaya_use_count";
 
   let messages = [];
@@ -253,15 +243,13 @@
   const messagesEl = document.getElementById("messages");
   const inputEl    = document.getElementById("user-input");
   const sendBtn    = document.getElementById("send-btn");
-  const badgeEl    = document.getElementById("remaining-badge");
 
   function init() {
-    updateBadge();
     addBubble("ai",
-      "こんにちは！弁護士アシスタントのiちゃんです😊\n\n" +
+      "こんにちは！弁護士アシスタントのi（アイ）です😊\n\n" +
       "法律のことって、なんだか難しそうで相談しにくいですよね。\n" +
       "でも大丈夫！どんな小さなことでも、気軽に聞いてみてください。\n\n" +
-      "まずは無料で5回、iちゃんがしっかりお答えします💙"
+      "まずは無料で3回、i（アイ）がしっかりお答えします💙"
     );
     if (useCount >= MAX_FREE) disableInput();
   }
@@ -275,7 +263,7 @@
     if (role === "ai") {
       const img = document.createElement("img");
       img.src = "ai-avatar.png";
-      img.alt = "iちゃん";
+      img.alt = "i（アイ）";
       avatar.appendChild(img);
     } else {
       avatar.textContent = "👤";
@@ -300,13 +288,13 @@
     avatar.className = "avatar";
     const img = document.createElement("img");
     img.src = "ai-avatar.png";
-    img.alt = "iちゃん";
+    img.alt = "i（アイ）";
     avatar.appendChild(img);
 
     const bubble = document.createElement("div");
     bubble.className = "bubble ai";
     bubble.innerHTML =
-      "無料でお答えできる5回分を使い切りました。<br><br>" +
+      "無料でお答えできる3回分を使い切りました。<br><br>" +
       "ここまで聞いてくれてありがとうございます😊<br>" +
       "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ。" +
       '<div class="contact-buttons">' +
@@ -324,19 +312,10 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  function updateBadge() {
-    const remaining = Math.max(0, MAX_FREE - useCount);
-    if (remaining > 0) {
-      badgeEl.textContent = "無料残り " + remaining + " 回";
-    } else {
-      badgeEl.textContent = "無料回数を使い切りました";
-    }
-  }
-
   function disableInput() {
     inputEl.disabled = true;
     sendBtn.disabled = true;
-    inputEl.placeholder = "無料回数を使い切りました";
+    inputEl.placeholder = "ご相談はこだまや法律事務所へどうぞ";
   }
 
   async function sendMessage() {
@@ -375,7 +354,6 @@
 
       useCount++;
       localStorage.setItem(STORAGE_KEY, String(useCount));
-      updateBadge();
 
       if (useCount >= MAX_FREE) {
         disableInput();
