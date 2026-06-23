@@ -18,39 +18,60 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --main: #1A7FA8;
+      --accent: #0E9DC5;
+      --yellow: #FFE066;
+      --bg: #EBF7FC;
+      --text: #0D3D52;
+      --subtext: #2E7A96;
+    }
+
     body {
       font-family: 'Noto Sans JP', sans-serif;
-      background: linear-gradient(160deg, #B8DDD8 0%, #EBF7FC 100%);
+      background: var(--bg);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #0D3D52;
+      color: var(--text);
     }
 
     header {
       width: 100%;
       max-width: 640px;
-      padding: 20px 16px 12px;
+      padding: 0 0 12px;
       text-align: center;
     }
-    header h1 {
-      font-size: 1.4rem;
+
+    .hero {
+      width: 100%;
+      background: linear-gradient(160deg, #7DD4ED 0%, #B8E8F5 50%, #E8F7FC 100%);
+      padding: 28px 16px 22px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 1.45rem;
       font-weight: 700;
-      color: #1A7FA8;
+      color: var(--text);
       letter-spacing: 0.02em;
     }
-    header p.subtitle {
-      font-size: 0.8rem;
-      color: #0D3D52;
-      opacity: 0.75;
-      margin-top: 4px;
+    .hero h1 span { color: var(--main); }
+    .hero p.subtitle {
+      font-size: 0.82rem;
+      color: var(--subtext);
+      margin-top: 5px;
     }
-    header p.office {
-      font-size: 0.72rem;
-      color: #1A7FA8;
-      margin-top: 2px;
-      font-weight: 500;
+    .hero p.office {
+      display: inline-block;
+      font-size: 0.7rem;
+      color: var(--main);
+      font-weight: 700;
+      margin-top: 8px;
+      background: rgba(255,255,255,0.7);
+      padding: 3px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(26,127,168,0.25);
     }
 
     #chat-wrapper {
@@ -60,16 +81,16 @@
       display: flex;
       flex-direction: column;
       padding: 0 12px;
-      padding-bottom: 80px;
+      padding-bottom: 90px;
     }
 
     #messages {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       overflow-y: auto;
-      padding: 8px 0 16px;
+      padding: 16px 0 16px;
     }
 
     .bubble-row {
@@ -80,16 +101,16 @@
     .bubble-row.user { flex-direction: row-reverse; }
 
     .avatar {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1rem;
-      background: #EBF7FC;
-      color: #fff;
+      background: var(--bg);
+      border: 2px solid var(--yellow);
       overflow: hidden;
     }
     .avatar img {
@@ -98,25 +119,44 @@
       object-fit: cover;
       border-radius: 50%;
     }
-    .bubble-row.user .avatar { background: #0E9DC5; }
+    .bubble-row.user .avatar {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
 
     .bubble {
       max-width: 78%;
-      padding: 10px 14px;
-      border-radius: 16px;
+      padding: 11px 15px;
+      border-radius: 18px;
       font-size: 0.88rem;
-      line-height: 1.65;
+      line-height: 1.7;
       white-space: pre-wrap;
       word-break: break-word;
+      transition: box-shadow 0.2s;
     }
     .bubble.ai {
       background: #FFFFFF;
       border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(26,127,168,0.10);
+      border-left: 3px solid var(--yellow);
+      color: var(--text);
+    }
+    .bubble.ai:hover {
+      box-shadow: 0 4px 16px rgba(26,127,168,0.18);
+      border-left-color: var(--accent);
     }
     .bubble.user {
-      background: #D4EDE9;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--main) 100%);
+      color: #fff;
       border-bottom-right-radius: 4px;
+      box-shadow: 0 2px 8px rgba(14,157,197,0.20);
+    }
+
+    .bubble-name {
+      font-size: 0.68rem;
+      color: var(--subtext);
+      margin-bottom: 3px;
+      padding-left: 4px;
     }
 
     #input-area {
@@ -126,10 +166,10 @@
       right: 0;
       display: flex;
       justify-content: center;
-      background: rgba(235, 247, 252, 0.92);
-      backdrop-filter: blur(8px);
-      border-top: 1px solid rgba(26,127,168,0.15);
-      padding: 10px 12px 14px;
+      background: rgba(235,247,252,0.96);
+      backdrop-filter: blur(10px);
+      border-top: 2px solid var(--yellow);
+      padding: 10px 12px 16px;
     }
     #input-inner {
       width: 100%;
@@ -141,66 +181,103 @@
     #user-input {
       flex: 1;
       resize: none;
-      border: 1.5px solid #B8DDD8;
-      border-radius: 12px;
-      padding: 10px 12px;
+      border: 1.5px solid rgba(26,127,168,0.3);
+      border-radius: 14px;
+      padding: 11px 14px;
       font-family: 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
-      color: #0D3D52;
+      color: var(--text);
       background: #fff;
       outline: none;
       max-height: 120px;
       line-height: 1.5;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    #user-input:focus { border-color: #1A7FA8; }
+    #user-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(14,157,197,0.12);
+    }
     #send-btn {
       flex-shrink: 0;
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       border: none;
-      background: #0E9DC5;
+      background: linear-gradient(135deg, var(--accent), var(--main));
       color: #fff;
       font-size: 1.2rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s, transform 0.1s;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 3px 10px rgba(14,157,197,0.35);
     }
-    #send-btn:hover { background: #1A7FA8; }
+    #send-btn:hover {
+      transform: scale(1.07);
+      box-shadow: 0 5px 16px rgba(14,157,197,0.45);
+    }
     #send-btn:active { transform: scale(0.93); }
-    #send-btn:disabled { background: #aaa; cursor: not-allowed; }
+    #send-btn:disabled {
+      background: #b0c9d4;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
 
     .contact-buttons {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .contact-btn {
       display: block;
       text-align: center;
       text-decoration: none;
-      padding: 10px 16px;
+      padding: 11px 16px;
       border-radius: 10px;
       font-size: 0.88rem;
       font-weight: 700;
       font-family: 'Noto Sans JP', sans-serif;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, transform 0.15s;
     }
-    .contact-btn:hover { opacity: 0.85; }
-    .contact-btn.tel { background: #0E9DC5; color: #fff; }
-    .contact-btn.form { background: #1A7FA8; color: #fff; }
+    .contact-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .contact-btn.tel {
+      background: linear-gradient(135deg, var(--accent), var(--main));
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(14,157,197,0.25);
+    }
+    .contact-btn.form {
+      background: #fff;
+      color: var(--main);
+      border: 2px solid var(--main);
+    }
+
+    .typing-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin: 0 2px;
+      animation: blink 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.2; }
+      40% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>⚖️ 弁護士に聞いてみっけ</h1>
-  <p class="subtitle">法律のこと、まずここで聞いてみて</p>
-  <p class="office">こだまや法律事務所</p>
+  <div class="hero">
+    <h1>⚖️ <span>弁護士に聞いてみっけ</span></h1>
+    <p class="subtitle">法律のこと、まずここで気軽に聞いてみて</p>
+    <p class="office">こだまや法律事務所</p>
+  </div>
 </header>
 
 <div id="chat-wrapper">
@@ -248,7 +325,7 @@
 
   function init() {
     addBubble("ai",
-      "こんにちは！弁護士アシスタントのi（アイ）です😊\n\n" +
+      "こんにちは！弁護士アシスタントのi（アイ）です\u{1F60A}\n\n" +
       "法律のことって、なんだか難しそうで相談しにくいですよね。\n" +
       "でも大丈夫！どんな小さなことでも、気軽に聞いてみてください。"
     );
@@ -259,6 +336,18 @@
   }
 
   function addBubble(role, text) {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "column";
+    wrap.style.alignItems = role === "user" ? "flex-end" : "flex-start";
+
+    if (role === "ai") {
+      const name = document.createElement("div");
+      name.className = "bubble-name";
+      name.textContent = "i（アイ）";
+      wrap.appendChild(name);
+    }
+
     const row = document.createElement("div");
     row.className = "bubble-row " + role;
 
@@ -279,12 +368,23 @@
 
     row.appendChild(avatar);
     row.appendChild(bubble);
-    messagesEl.appendChild(row);
+    wrap.appendChild(row);
+    messagesEl.appendChild(wrap);
     scrollBottom();
     return bubble;
   }
 
-  function showLimitBubble() {
+  function addLoadingBubble() {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "column";
+    wrap.style.alignItems = "flex-start";
+
+    const name = document.createElement("div");
+    name.className = "bubble-name";
+    name.textContent = "i（アイ）";
+    wrap.appendChild(name);
+
     const row = document.createElement("div");
     row.className = "bubble-row ai";
 
@@ -298,15 +398,52 @@
     const bubble = document.createElement("div");
     bubble.className = "bubble ai";
     bubble.innerHTML =
-      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ😊" +
+      '<span class="typing-dot"></span>' +
+      '<span class="typing-dot"></span>' +
+      '<span class="typing-dot"></span>';
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    wrap.appendChild(row);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+    return bubble;
+  }
+
+  function showLimitBubble() {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "column";
+    wrap.style.alignItems = "flex-start";
+
+    const name = document.createElement("div");
+    name.className = "bubble-name";
+    name.textContent = "i（アイ）";
+    wrap.appendChild(name);
+
+    const row = document.createElement("div");
+    row.className = "bubble-row ai";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    const img = document.createElement("img");
+    img.src = "ai-avatar.png";
+    img.alt = "i（アイ）";
+    avatar.appendChild(img);
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble ai";
+    bubble.innerHTML =
+      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ\u{1F60A}" +
       '<div class="contact-buttons">' +
-        '<a class="contact-btn tel" href="tel:042-975-1000">📞 電話で相談する：042-975-1000</a>' +
-        '<a class="contact-btn form" href="https://kodamaya-info.ssl-xserver.jp/script/mailform/file/" target="_blank" rel="noopener">✉️ お問合せフォームはこちら</a>' +
+        '<a class="contact-btn tel" href="tel:042-975-1000">\u{1F4DE} 電話で相談する：042-975-1000</a>' +
+        '<a class="contact-btn form" href="https://kodamaya-info.ssl-xserver.jp/script/mailform/file/" target="_blank" rel="noopener">\u{2709}\u{FE0F} お問合せフォームはこちら</a>' +
       "</div>";
 
     row.appendChild(avatar);
     row.appendChild(bubble);
-    messagesEl.appendChild(row);
+    wrap.appendChild(row);
+    messagesEl.appendChild(wrap);
     scrollBottom();
   }
 
@@ -337,7 +474,7 @@
 
     messages.push({ role: "user", content: text });
 
-    const loadingBubble = addBubble("ai", "考え中...");
+    const loadingBubble = addLoadingBubble();
 
     try {
       const res = await fetch(WORKER_URL, {
@@ -351,6 +488,7 @@
       const data = await res.json();
       const reply = data?.content?.[0]?.text || "回答を取得できませんでした。";
 
+      loadingBubble.innerHTML = "";
       loadingBubble.textContent = reply;
       messages.push({ role: "assistant", content: reply });
 
@@ -359,9 +497,10 @@
 
       if (useCount >= MAX_FREE) {
         disableInput();
-        setTimeout(() => showLimitBubble(), 500);
+        setTimeout(() => showLimitBubble(), 600);
       }
     } catch (e) {
+      loadingBubble.innerHTML = "";
       loadingBubble.textContent = "一時的にエラーが発生しました。少し待ってからもう一度お試しください。";
     } finally {
       if (useCount < MAX_FREE) sendBtn.disabled = false;
