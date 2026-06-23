@@ -4,14 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>弁護士に聞いてみっけ｜こだまや法律事務所</title>
+
   <meta property="og:title" content="弁護士に聞いてみっけ" />
   <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。弁護士アシスタントi（アイ）がお答えします。" />
   <meta property="og:url" content="https://spc-jp.github.io/kodamaya-chat/" />
   <meta property="og:image" content="" />
+
   <link rel="icon" type="image/png" href="ai-avatar.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -95,9 +98,7 @@
       object-fit: cover;
       border-radius: 50%;
     }
-    .bubble-row.user .avatar {
-      background: #0E9DC5;
-    }
+    .bubble-row.user .avatar { background: #0E9DC5; }
 
     .bubble {
       max-width: 78%;
@@ -190,31 +191,29 @@
       transition: opacity 0.2s;
     }
     .contact-btn:hover { opacity: 0.85; }
-    .contact-btn.tel {
-      background: #0E9DC5;
-      color: #fff;
-    }
-    .contact-btn.form {
-      background: #1A7FA8;
-      color: #fff;
-    }
+    .contact-btn.tel { background: #0E9DC5; color: #fff; }
+    .contact-btn.form { background: #1A7FA8; color: #fff; }
   </style>
 </head>
 <body>
+
 <header>
   <h1>⚖️ 弁護士に聞いてみっけ</h1>
   <p class="subtitle">法律のこと、まずここで聞いてみて</p>
   <p class="office">こだまや法律事務所</p>
 </header>
+
 <div id="chat-wrapper">
   <div id="messages"></div>
 </div>
+
 <div id="input-area">
   <div id="input-inner">
     <textarea id="user-input" rows="1" placeholder="ここに質問を入力してください…"></textarea>
     <button id="send-btn" title="送信">&#9654;</button>
   </div>
 </div>
+
 <script>
   const WORKER_URL = "https://kodamaya-chat.yymmatsu.workers.dev";
 
@@ -228,10 +227,13 @@
 
 難しい言葉は使わず、友達に話しかけるようなやさしい言葉を選んでください。
 200文字以内でコンパクトにまとめてください。
-回答の最後には必ず「詳しくはこだまや法律事務所にご相談くださいね」と添えてください。
 個別の法律判断や具体的なアドバイスはせず、あくまで一般的な情報をお伝えするにとどめてください。
 自分は弁護士ではなくAIアシスタントであることを忘れずに、謙虚な姿勢で接してください。
 自分のことは「i（アイ）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
+
+回答の最後には、会話の回数に応じて次のように自然につなげてください。
+1回目と2回目の回答では「他にも気になることがあれば、気軽に聞いてくださいね」という雰囲気で会話を続けてください。
+3回目の回答では「今日お話しした内容について、もう少し具体的にご相談されてみませんか？こだまや法律事務所では、はじめての方でも安心してご相談いただけますよ」という形で自然に事務所への橋渡しをしてください。
 `;
 
   const MAX_FREE = 3;
@@ -248,10 +250,12 @@
     addBubble("ai",
       "こんにちは！弁護士アシスタントのi（アイ）です😊\n\n" +
       "法律のことって、なんだか難しそうで相談しにくいですよね。\n" +
-      "でも大丈夫！どんな小さなことでも、気軽に聞いてみてください。\n\n" +
-      "まずは無料で3回、i（アイ）がしっかりお答えします💙"
+      "でも大丈夫！どんな小さなことでも、気軽に聞いてみてください。"
     );
-    if (useCount >= MAX_FREE) disableInput();
+    if (useCount >= MAX_FREE) {
+      showLimitBubble();
+      disableInput();
+    }
   }
 
   function addBubble(role, text) {
@@ -280,7 +284,7 @@
     return bubble;
   }
 
-  function addLimitBubble() {
+  function showLimitBubble() {
     const row = document.createElement("div");
     row.className = "bubble-row ai";
 
@@ -294,9 +298,7 @@
     const bubble = document.createElement("div");
     bubble.className = "bubble ai";
     bubble.innerHTML =
-      "無料でお答えできる3回分を使い切りました。<br><br>" +
-      "ここまで聞いてくれてありがとうございます😊<br>" +
-      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ。" +
+      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ😊" +
       '<div class="contact-buttons">' +
         '<a class="contact-btn tel" href="tel:042-975-1000">📞 電話で相談する：042-975-1000</a>' +
         '<a class="contact-btn form" href="https://kodamaya-info.ssl-xserver.jp/script/mailform/file/" target="_blank" rel="noopener">✉️ お問合せフォームはこちら</a>' +
@@ -323,7 +325,7 @@
     if (!text) return;
 
     if (useCount >= MAX_FREE) {
-      addLimitBubble();
+      showLimitBubble();
       disableInput();
       return;
     }
@@ -357,7 +359,7 @@
 
       if (useCount >= MAX_FREE) {
         disableInput();
-        setTimeout(() => addLimitBubble(), 400);
+        setTimeout(() => showLimitBubble(), 500);
       }
     } catch (e) {
       loadingBubble.textContent = "一時的にエラーが発生しました。少し待ってからもう一度お試しください。";
