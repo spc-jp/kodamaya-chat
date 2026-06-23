@@ -10,6 +10,9 @@
   <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。こだまや法律事務所のAIアシスタントです。" />
   <meta property="og:image" content="" />
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%231A7FA8'/%3E%3C/svg%3E" />
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -178,6 +181,34 @@
       color: #1A7FA8;
       padding-bottom: 4px;
     }
+
+    /* お問合せボタン */
+    .contact-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .contact-btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: opacity 0.2s;
+    }
+    .contact-btn:hover { opacity: 0.85; }
+    .contact-btn.tel {
+      background: #0E9DC5;
+      color: #fff;
+    }
+    .contact-btn.form {
+      background: #1A7FA8;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -219,7 +250,7 @@
 ・私は弁護士ではなくAIアシスタントであることを常に意識する
 `;
 
-  const MAX_FREE = 3;
+  const MAX_FREE = 5;
   const STORAGE_KEY = "kodamaya_use_count";
 
   // ===== 状態管理 =====
@@ -238,7 +269,7 @@
     addBubble("ai",
       "こんにちは！こだまや法律事務所のAIアシスタントです😊\n\n" +
       "法律のことで気になることがあれば、なんでも気軽に聞いてください。\n\n" +
-      "まずは無料で3回ご質問いただけます。"
+      "まずは無料で5回ご質問いただけます。"
     );
     if (useCount >= MAX_FREE) disableInput();
   }
@@ -261,6 +292,31 @@
     messagesEl.appendChild(row);
     scrollBottom();
     return bubble;
+  }
+
+  // ===== 上限到達メッセージ（ボタン付き）=====
+  function addLimitBubble() {
+    const row = document.createElement("div");
+    row.className = "bubble-row ai";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "⚖️";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble ai";
+    bubble.innerHTML =
+      "無料相談の回数（5回）を使い切りました。<br><br>" +
+      "引き続きのご相談は、こだまや法律事務所へお気軽にどうぞ。" +
+      '<div class="contact-buttons">' +
+        '<a class="contact-btn tel" href="tel:042-975-1000">📞 電話で相談する：042-975-1000</a>' +
+        '<a class="contact-btn form" href="https://kodamaya-info.ssl-xserver.jp/script/mailform/file/" target="_blank" rel="noopener">✉️ お問合せフォームはこちら</a>' +
+      "</div>";
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    messagesEl.appendChild(row);
+    scrollBottom();
   }
 
   function scrollBottom() {
@@ -290,11 +346,7 @@
     if (!text) return;
 
     if (useCount >= MAX_FREE) {
-      addBubble("ai",
-        "無料相談の回数（3回）を使い切りました。\n\n" +
-        "引き続きご相談はこだまや法律事務所へお気軽にどうぞ。\n\n" +
-        "【こだまや法律事務所】"
-      );
+      addLimitBubble();
       disableInput();
       return;
     }
@@ -333,13 +385,7 @@
 
       if (useCount >= MAX_FREE) {
         disableInput();
-        setTimeout(() => {
-          addBubble("ai",
-            "無料相談の回数（3回）を使い切りました。\n\n" +
-            "引き続きご相談はこだまや法律事務所へお気軽にどうぞ。\n\n" +
-            "【こだまや法律事務所】"
-          );
-        }, 400);
+        setTimeout(() => addLimitBubble(), 400);
       }
     } catch (e) {
       loadingBubble.textContent = "一時的にエラーが発生しました。少し待ってからもう一度お試しください。";
