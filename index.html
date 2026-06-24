@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>弁護士に聞いてみっけ｜こだまや法律事務所</title>
   <meta property="og:title" content="弁護士に聞いてみっけ" />
-  <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。弁護士アシスタントi（アイ）がお答えします。" />
+  <meta property="og:description" content="法律のこと、まずここで気軽に聞いてみてください。弁護士アシスタントi（あい）がお答えします。" />
   <meta property="og:url" content="https://spc-jp.github.io/kodamaya-chat/" />
   <meta property="og:image" content="" />
   <link rel="icon" type="image/png" href="https://spc-jp.github.io/kodamaya-chat/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -78,6 +78,22 @@
       border: 2px solid var(--yellow); overflow: hidden;
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .avatar.ai-avatar { animation: float 3s ease-in-out infinite; }
+    .avatar.ai-avatar.thinking { animation: shake 0.4s ease-in-out infinite; }
+    .avatar.ai-avatar.enter { animation: fadeInDown 0.6s ease forwards; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0px); }
+      25% { transform: translateX(-2px); }
+      75% { transform: translateX(2px); }
+    }
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-12px); }
+      100% { opacity: 1; transform: translateY(0px); }
+    }
     .bubble-row.user .avatar { background: var(--accent); border-color: var(--accent); }
     .bubble {
       max-width: 78%; padding: 11px 15px; border-radius: 18px;
@@ -129,11 +145,34 @@
       text-align: left;
       transition: background 0.18s, color 0.18s, transform 0.12s;
     }
-    .example-btn:hover {
-      background: var(--accent);
-      color: #fff;
-      transform: translateY(-1px);
+    .example-btn:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
+
+    .theme-label {
+      font-size: 0.72rem;
+      color: var(--subtext);
+      margin: 8px 0 6px 0;
+      text-align: center;
     }
+    .theme-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .theme-btn {
+      background: #fff;
+      border: 1.5px solid var(--main);
+      color: var(--main);
+      border-radius: 20px;
+      padding: 7px 16px;
+      font-size: 0.82rem;
+      font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, transform 0.12s;
+      font-weight: 500;
+    }
+    .theme-btn:hover { background: var(--main); color: #fff; transform: translateY(-1px); }
 
     #input-area {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -219,7 +258,7 @@
 <script>
   const WORKER_URL = "https://kodamaya-chat.yymmatsu.workers.dev";
 
-  const SYSTEM_PROMPT = `あなたは「i（アイ）」という名前の弁護士アシスタントです。
+  const SYSTEM_PROMPT = `あなたは「i（あい）」という名前の弁護士アシスタントです。
 こだまや法律事務所のサポートスタッフとして、法律のことで困っている方に寄り添いながら、わかりやすく情報をお伝えするのがお仕事です。
 相続や遺言、離婚、債務整理、交通事故、不動産のトラブル、企業法務など、どんなご相談でも丁寧にお答えします。
 
@@ -228,11 +267,11 @@
 200文字以内でコンパクトにまとめてください。
 個別の法律判断や具体的なアドバイスはせず、あくまで一般的な情報をお伝えするにとどめてください。
 自分は弁護士ではなくAIアシスタントであることを忘れずに、謙虚な姿勢で接してください。
-自分のことは「i（アイ）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
+自分のことは「i（あい）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
 回答には「**」「##」「###」「- 」「* 」などのマークダウン記号は一切使わないでください。記号なしの自然な日本語だけで答えてください。`;
 
   const BRIDGE_1 = "他にお知りになりたいことはございますか？どんな小さなことでも、気軽に聞いてくださいね。";
-  const BRIDGE_2 = "まだ気になることがあれば、遠慮なく聞いてください。i（アイ）がしっかりお答えします。";
+  const BRIDGE_2 = "まだ気になることがあれば、遠慮なく聞いてください。i（あい）がしっかりお答えします。";
   const BRIDGE_3 = "今日のお話、もう少し具体的に弁護士に相談してみませんか？こだまや法律事務所では、はじめての方でも安心してご相談いただけますよ。";
 
   const EXAMPLES = [
@@ -243,12 +282,20 @@
     "💬 交通事故に遭ったらどうすればいいですか？"
   ];
 
+  const THEMES = [
+    { label: "📝 相続・遺言", question: "相続や遺言について基本的なことを教えてください" },
+    { label: "💔 離婚・男女問題", question: "離婚についての基本的な流れを教えてください" },
+    { label: "💰 借金・債務整理", question: "借金の返済が難しくなった場合の選択肢を教えてください" },
+    { label: "🏢 企業・契約トラブル", question: "企業間のトラブルや契約問題について教えてください" },
+    { label: "🚗 交通事故", question: "交通事故に遭ったときの対応について教えてください" },
+    { label: "🏠 不動産トラブル", question: "不動産に関するトラブルについて教えてください" }
+  ];
+
   const MAX_FREE = 3;
   const STORAGE_KEY = "kodamaya_use_count_v3";
 
   let messages = [];
   let useCount = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
-  let exampleShown = true;
 
   const messagesEl = document.getElementById("messages");
   const inputEl    = document.getElementById("user-input");
@@ -256,7 +303,7 @@
 
   function init() {
     addBubble("ai",
-      "こんにちは！弁護士アシスタントのi（アイ）です。\n\n" +
+      "こんにちは！弁護士アシスタントのi（あい）です。\n\n" +
       "法律のことって、なんだか難しそうで相談しにくいですよね。\n" +
       "でも大丈夫！どんな小さなことでも、気軽に聞いてみてください。"
     );
@@ -270,16 +317,13 @@
 
   function addExampleButtons() {
     const wrap = document.createElement("div");
-
     const label = document.createElement("div");
     label.className = "example-label";
     label.textContent = "例えばこんなことを聞いてみてください";
     wrap.appendChild(label);
-
     const btnArea = document.createElement("div");
     btnArea.className = "example-buttons";
     btnArea.id = "example-buttons";
-
     EXAMPLES.forEach(text => {
       const btn = document.createElement("button");
       btn.className = "example-btn";
@@ -292,7 +336,6 @@
       });
       btnArea.appendChild(btn);
     });
-
     wrap.appendChild(btnArea);
     messagesEl.appendChild(wrap);
     scrollBottom();
@@ -303,20 +346,61 @@
     if (el && el.parentNode) el.parentNode.remove();
   }
 
+  function addThemeButtons() {
+    const wrap = document.createElement("div");
+    wrap.id = "theme-buttons-wrap";
+    wrap.style.cssText = "margin-top:8px;";
+
+    const label = document.createElement("div");
+    label.className = "theme-label";
+    label.textContent = "他のテーマについても聞いてみませんか？";
+    wrap.appendChild(label);
+
+    const btnArea = document.createElement("div");
+    btnArea.className = "theme-buttons";
+
+    THEMES.forEach(theme => {
+      const btn = document.createElement("button");
+      btn.className = "theme-btn";
+      btn.textContent = theme.label;
+      btn.addEventListener("click", () => {
+        removeThemeButtons();
+        useCount = 0;
+        localStorage.setItem(STORAGE_KEY, "0");
+        messages = [];
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        inputEl.placeholder = "ここに質問を入力してください...";
+        inputEl.value = theme.question;
+        sendMessage();
+      });
+      btnArea.appendChild(btn);
+    });
+
+    wrap.appendChild(btnArea);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function removeThemeButtons() {
+    const el = document.getElementById("theme-buttons-wrap");
+    if (el) el.remove();
+  }
+
   function createAiWrap() {
     const wrap = document.createElement("div");
     wrap.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;";
     const name = document.createElement("div");
     name.className = "bubble-name";
-    name.textContent = "i（アイ）";
+    name.textContent = "i（あい）";
     wrap.appendChild(name);
     const row = document.createElement("div");
     row.className = "bubble-row ai";
     const avatar = document.createElement("div");
-    avatar.className = "avatar";
+    avatar.className = "avatar ai-avatar enter";
     const img = document.createElement("img");
     img.src = "ai-avatar.png";
-    img.alt = "i（アイ）";
+    img.alt = "i（あい）";
     avatar.appendChild(img);
     row.appendChild(avatar);
     wrap.appendChild(row);
@@ -354,6 +438,8 @@
     const bubble = document.createElement("div");
     bubble.className = "bubble ai";
     bubble.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    const thinkingAvatar = row.querySelector('.avatar');
+    if (thinkingAvatar) thinkingAvatar.classList.add('thinking');
     row.appendChild(bubble);
     messagesEl.appendChild(wrap);
     scrollBottom();
@@ -373,6 +459,7 @@
     row.appendChild(bubble);
     messagesEl.appendChild(wrap);
     scrollBottom();
+    setTimeout(() => addThemeButtons(), 600);
   }
 
   function scrollBottom() {
@@ -427,6 +514,8 @@
 
       loadingBubble.innerHTML = "";
       loadingBubble.textContent = aiReply + bridge;
+      const tAvatar = loadingBubble.closest('.bubble-row')?.querySelector('.avatar');
+      if (tAvatar) tAvatar.classList.remove('thinking');
       messages.push({ role: "assistant", content: aiReply });
 
       if (useCount >= MAX_FREE) {
@@ -436,6 +525,8 @@
     } catch (e) {
       loadingBubble.innerHTML = "";
       loadingBubble.textContent = "一時的にエラーが発生しました。少し待ってからもう一度お試しください。";
+      const eAvatar = loadingBubble.closest('.bubble-row')?.querySelector('.avatar');
+      if (eAvatar) eAvatar.classList.remove('thinking');
     } finally {
       if (useCount < MAX_FREE) sendBtn.disabled = false;
       scrollBottom();
