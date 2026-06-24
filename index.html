@@ -103,6 +103,38 @@
       box-shadow: 0 2px 8px rgba(14,157,197,0.20);
     }
     .bubble-name { font-size: 0.68rem; color: var(--subtext); margin-bottom: 3px; padding-left: 4px; }
+
+    .example-label {
+      font-size: 0.72rem;
+      color: var(--subtext);
+      margin: 4px 0 6px 46px;
+    }
+    .example-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-left: 46px;
+      margin-bottom: 4px;
+    }
+    .example-btn {
+      display: inline-block;
+      background: #fff;
+      border: 1.5px solid var(--accent);
+      color: var(--main);
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.18s, color 0.18s, transform 0.12s;
+    }
+    .example-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
     #input-area {
       position: fixed; bottom: 0; left: 0; right: 0;
       display: flex; justify-content: center;
@@ -196,17 +228,27 @@
 200文字以内でコンパクトにまとめてください。
 個別の法律判断や具体的なアドバイスはせず、あくまで一般的な情報をお伝えするにとどめてください。
 自分は弁護士ではなくAIアシスタントであることを忘れずに、謙虚な姿勢で接してください。
-自分のことは「i（アイ）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。`;
+自分のことは「i（アイ）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
+回答には「**」「##」「###」「- 」「* 」などのマークダウン記号は一切使わないでください。記号なしの自然な日本語だけで答えてください。`;
 
   const BRIDGE_1 = "他にお知りになりたいことはございますか？どんな小さなことでも、気軽に聞いてくださいね。";
   const BRIDGE_2 = "まだ気になることがあれば、遠慮なく聞いてください。i（アイ）がしっかりお答えします。";
   const BRIDGE_3 = "今日のお話、もう少し具体的に弁護士に相談してみませんか？こだまや法律事務所では、はじめての方でも安心してご相談いただけますよ。";
+
+  const EXAMPLES = [
+    "💬 離婚したいけど何から始めればいいですか？",
+    "💬 親が亡くなって遺産のことで揉めています",
+    "💬 借金が返せなくなってきました",
+    "💬 職場でハラスメントを受けています",
+    "💬 交通事故に遭ったらどうすればいいですか？"
+  ];
 
   const MAX_FREE = 3;
   const STORAGE_KEY = "kodamaya_use_count_v2";
 
   let messages = [];
   let useCount = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+  let exampleShown = true;
 
   const messagesEl = document.getElementById("messages");
   const inputEl    = document.getElementById("user-input");
@@ -221,7 +263,44 @@
     if (useCount >= MAX_FREE) {
       showLimitBubble();
       disableInput();
+    } else {
+      addExampleButtons();
     }
+  }
+
+  function addExampleButtons() {
+    const wrap = document.createElement("div");
+
+    const label = document.createElement("div");
+    label.className = "example-label";
+    label.textContent = "例えばこんなことを聞いてみてください";
+    wrap.appendChild(label);
+
+    const btnArea = document.createElement("div");
+    btnArea.className = "example-buttons";
+    btnArea.id = "example-buttons";
+
+    EXAMPLES.forEach(text => {
+      const btn = document.createElement("button");
+      btn.className = "example-btn";
+      btn.textContent = text;
+      btn.addEventListener("click", () => {
+        removeExampleButtons();
+        const clean = text.replace("💬 ", "");
+        inputEl.value = clean;
+        sendMessage();
+      });
+      btnArea.appendChild(btn);
+    });
+
+    wrap.appendChild(btnArea);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function removeExampleButtons() {
+    const el = document.getElementById("example-buttons");
+    if (el && el.parentNode) el.parentNode.remove();
   }
 
   function createAiWrap() {
@@ -261,7 +340,6 @@
       row.appendChild(avatar);
       wrap.appendChild(row);
     }
-
     const bubble = document.createElement("div");
     bubble.className = "bubble " + role;
     bubble.textContent = text;
@@ -317,6 +395,7 @@
       return;
     }
 
+    removeExampleButtons();
     addBubble("user", text);
     inputEl.value = "";
     autoResize();
