@@ -292,7 +292,10 @@
   ];
 
   const MAX_FREE = 3;
-  const STORAGE_KEY = "kodamaya_use_count_v3";
+  const STORAGE_KEY = "kodamaya_use_count_v4";
+
+  // 古いバージョンのキーを自動削除
+  ["kodamaya_use_count", "kodamaya_use_count_v2", "kodamaya_use_count_v3"].forEach(k => localStorage.removeItem(k));
 
   let messages = [];
   let useCount = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
