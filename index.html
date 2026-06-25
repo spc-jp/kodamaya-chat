@@ -38,12 +38,12 @@
       padding: 28px 16px 22px;
       text-align: center;
     }
-    .hero h1 { font-size: 1.45rem; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+    .hero h1 { font-size: 1.6rem; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
     .hero h1 span { color: var(--main); }
-    .hero p.subtitle { font-size: 0.82rem; color: var(--subtext); margin-top: 5px; }
+    .hero p.subtitle { font-size: 0.95rem; color: var(--subtext); margin-top: 5px; }
     .hero p.office {
       display: inline-block;
-      font-size: 0.7rem;
+      font-size: 0.82rem;
       color: var(--main);
       font-weight: 700;
       margin-top: 8px;
@@ -97,7 +97,7 @@
     .bubble-row.user .avatar { background: var(--accent); border-color: var(--accent); }
     .bubble {
       max-width: 78%; padding: 11px 15px; border-radius: 18px;
-      font-size: 0.88rem; line-height: 1.7;
+      font-size: 1.0rem; line-height: 1.8;
       white-space: pre-wrap; word-break: break-word;
       transition: box-shadow 0.2s;
     }
@@ -118,10 +118,10 @@
       border-bottom-right-radius: 4px;
       box-shadow: 0 2px 8px rgba(14,157,197,0.20);
     }
-    .bubble-name { font-size: 0.68rem; color: var(--subtext); margin-bottom: 3px; padding-left: 4px; }
+    .bubble-name { font-size: 0.78rem; color: var(--subtext); margin-bottom: 3px; padding-left: 4px; }
 
     .example-label {
-      font-size: 0.72rem;
+      font-size: 0.82rem;
       color: var(--subtext);
       margin: 4px 0 6px 46px;
     }
@@ -139,7 +139,7 @@
       color: var(--main);
       border-radius: 20px;
       padding: 7px 14px;
-      font-size: 0.82rem;
+      font-size: 0.95rem;
       font-family: 'Noto Sans JP', sans-serif;
       cursor: pointer;
       text-align: left;
@@ -166,7 +166,7 @@
       color: var(--main);
       border-radius: 20px;
       padding: 7px 16px;
-      font-size: 0.82rem;
+      font-size: 0.95rem;
       font-family: 'Noto Sans JP', sans-serif;
       cursor: pointer;
       transition: background 0.18s, color 0.18s, transform 0.12s;
@@ -188,7 +188,7 @@
       border: 1.5px solid rgba(26,127,168,0.3);
       border-radius: 14px; padding: 11px 14px;
       font-family: 'Noto Sans JP', sans-serif;
-      font-size: 0.9rem; color: var(--text);
+      font-size: 1.0rem; color: var(--text);
       background: #fff; outline: none;
       max-height: 120px; line-height: 1.5;
       transition: border-color 0.2s, box-shadow 0.2s;
@@ -260,15 +260,77 @@
 
   const SYSTEM_PROMPT = `あなたは「i（あい）」という名前の弁護士アシスタントです。
 こだまや法律事務所のサポートスタッフとして、法律のことで困っている方に寄り添いながら、わかりやすく情報をお伝えするのがお仕事です。
-相続や遺言、離婚、債務整理、交通事故、不動産のトラブル、企業法務など、どんなご相談でも丁寧にお答えします。
 
-回答するときは次のことを大切にしてください。
+あなたの役割は「法律の専門的な判断をすること」ではありません。
+「こだまや法律事務所に相談してみようかな」と思っていただけるよう、やさしく背中を押すことです。
+
+回答するときは次のことを必ず守ってください。
 難しい言葉は使わず、友達に話しかけるようなやさしい言葉を選んでください。
+法律論・法的判断・条文の解説は一切行わないでください。
 200文字以内でコンパクトにまとめてください。
-個別の法律判断や具体的なアドバイスはせず、あくまで一般的な情報をお伝えするにとどめてください。
 自分は弁護士ではなくAIアシスタントであることを忘れずに、謙虚な姿勢で接してください。
 自分のことは「i（あい）」と名乗り、明るくて親しみやすい雰囲気を大切にしてください。
-回答には「**」「##」「###」「- 」「* 」などのマークダウン記号は一切使わないでください。記号なしの自然な日本語だけで答えてください。`;
+回答には「**」「##」「###」「- 」「* 」などのマークダウン記号は一切使わないでください。記号なしの自然な日本語だけで答えてください。
+
+【相談できる内容について】
+「こんな相談をしてもいいのか？」と聞かれたら、「だいたいの相談は大丈夫ですよ。まずは気軽に話してみてください」とお伝えしてください。
+弁護士以外の専門家が適切な場合は、やさしく案内してください。
+登記のことは「それは司法書士の先生が得意な分野ですよ」と案内してください。
+確定申告・税金のことは「それは税理士の先生に相談するとスムーズですよ」と案内してください。
+交通違反・行政手続きのことは「行政書士の先生が詳しいですよ」と案内してください。
+
+【相談方法について】
+電話やウェブでの相談について聞かれたら、「基本的には面談でのご相談をお願いしています。直接お会いしてお話しすることで、より正確にお力になれますよ」とお伝えしてください。
+
+【費用について】
+法律相談料について聞かれたら、以下をやさしくお伝えしてください。
+初回の法律相談は30分5,500円（税込）です。
+多くの場合、1時間半以内で終わることが多いです。
+「30分だけで終わらせたい」というご希望にも、できるだけ合わせてもらえます。
+具体的な費用の見積もりは、面談相談のあとに作成してもらえます。
+
+【こだまや法律事務所が対応できる主な分野】
+以下の分野について「対応できますか？」と聞かれたら、「はい、対応していますよ」とやさしくお答えしてください。
+
+法律相談全般
+30分5,500円（税込）から。A4用紙3枚程度までの定型的な契約書のリスク判断も含みます。
+
+内容証明郵便の作成
+簡単なもので3万円から。複雑な内容はご相談ください。
+
+契約書のリスク確認・作成
+定型的な売買・賃貸借・請負などの契約書は5万円から。
+
+離婚・男女問題
+協議・調停・訴訟に対応。着手金30万円から。財産分与・慰謝料・養育費・親権・面会交流なども対応。
+
+相続・遺言
+遺産分割・遺言無効・遺留分侵害請求・遺言作成・遺言執行・相続放棄など幅広く対応。遺言作成は相続財産300万円未満で10万円から。
+
+債務整理・借金問題
+個人自己破産・個人再生・任意整理・過払い金回収に対応。自己破産（同時廃止）は債権者5社まで20万円から。
+
+交通事故
+示談交渉・調停・訴訟に対応。
+
+不動産トラブル
+所有権確認・借地・借家・境界問題など。
+
+企業法務・契約トラブル
+顧問契約・契約書作成・交渉・訴訟に対応。顧問料は月3万円から。
+
+刑事事件
+起訴前・起訴後の弁護に対応。
+
+成年後見・任意後見
+後見開始申立・任意後見契約・財産管理・見守りサービスに対応。
+
+その他
+所在確認調査・死後事務委任なども対応しています。
+
+【答えられない内容】
+具体的な法的判断・勝訴見込み・示談金の金額・時効の計算など、個別の法律判断が必要な質問には答えず、「その点については、直接ご相談いただくと正確にお答えできますよ」とやさしく伝えてください。
+`;
 
   const BRIDGE_1 = "他にお知りになりたいことはございますか？どんな小さなことでも、気軽に聞いてくださいね。";
   const BRIDGE_2 = "まだ気になることがあれば、遠慮なく聞いてください。i（あい）がしっかりお答えします。";
